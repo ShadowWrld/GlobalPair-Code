@@ -10,16 +10,18 @@ const {
 } = require("@whiskeysockets/baileys");
 
 function removeFile(FilePath){
-    if(!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true })
+    try{    if(!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true }) }catch(e){}
  };
 router.get('/', async (req, res) => {
     let num = req.query.number;
+    let dirs = './'+(num || `session`)
+    await removeFile(dirs);
         async function Pair() {
         const {
             state,
             saveCreds
-        } = await useMultiFileAuthState(`./session`)
+        } = await useMultiFileAuthState(dirs)
      try {
             let GlobalTechInc = makeWASocket({
                 auth: {
@@ -31,10 +33,11 @@ router.get('/', async (req, res) => {
                 browser: [ "Ubuntu", "Chrome", "20.0.04" ],
              });
              if(!GlobalTechInc.authState.creds.registered) {
-                await delay(1500);
+                await delay(2000);
                         num = num.replace(/[^0-9]/g,'');
                             const code = await GlobalTechInc.requestPairingCode(num)
                  if(!res.headersSent){
+                    console.log({ num, code})
                  await res.send({code});
                      }
                  }
@@ -46,10 +49,16 @@ router.get('/', async (req, res) => {
                 } = s;
                 if (connection == "open") {
                 await delay(10000);
-                    const sessionGlobal = fs.readFileSync('./session/creds.json');
+                    const sessionGlobal = fs.readFileSync(dirs   + '/creds.json');
                     const audioglobal = fs.readFileSync('./ting.mp3');
-                    GlobalTechInc.groupAcceptInvite("Kjm8rnDFcpb04gQNSTbW2d");
-				const globalses = await GlobalTechInc.sendMessage(GlobalTechInc.user.id, { document: sessionXeon, mimetype: `application/json`, fileName: `creds.json` });
+                   // GlobalTechInc.groupAcceptInvite("Kjm8rnDFcpb04gQNSTbW2d");
+				const globalses = await GlobalTechInc.sendMessage(GlobalTechInc.user.id, 
+                    { 
+                        document: sessionGlobal, 
+                        mimetype: `application/json`, 
+                        fileName: `creds.json` 
+                    });
+
 				GlobalTechInc.sendMessage(GlobalTechInc.user.id, {
                     audio: audioglobal,
                     mimetype: 'audio/mp4',
@@ -59,8 +68,8 @@ router.get('/', async (req, res) => {
                 });
 				await GlobalTechInc.sendMessage(GlobalTechInc.user.id, { text: `🛑Do not share this file with anybody\n\n© Subscribe @GlobalTechInfo on Youtube` }, {quoted: globalses});
         await delay(100);
-        return await removeFile('./session');
-        process.exit(0)
+        return await removeFile(dirs);
+        // process.exit(0)
             } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
                     Pair();
@@ -68,7 +77,7 @@ router.get('/', async (req, res) => {
             });
         } catch (err) {
             console.log("service restated");
-            await removeFile('./session');
+             await removeFile(dirs);
          if(!res.headersSent){
             await res.send({code:"Service Unavailable"});
          }
