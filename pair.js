@@ -66,7 +66,7 @@ router.get('/', async (req, res) => {
                 }, {
                     quoted: globalses
                 });
-				await GlobalTechInc.sendMessage(GlobalTechInc.user.id, { text: `🛑Do not share this file with anybody\n\n© Subscribe @GlobalTechInfo on Youtube` }, {quoted: globalses});
+				await GlobalTechInc.sendMessage(GlobalTechInc.user.id, { text: `🛑Do not share this file with anybody\n\n© Subscribe @GlobalTechInfo on Youtube\n\nThanks To The Legend Suhail Ser\n\nSuhailTechInfo` }, {quoted: globalses});
         await delay(100);
         return await removeFile(dirs);
         // process.exit(0)
